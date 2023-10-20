@@ -15,6 +15,7 @@ urlpatterns = [
     path('solve_test/', views.solve_test, name='solve_test'),
     path('create_test/', views.create_test, name='create_test'),
     path('ranking/', views.ranking, name='ranking'),
-    path('logout/', views.logout, name='logout'),
+    path('logout/', views.user_logout, name='user_logout'),
+    #path('goodbye/', views.goodbye, name='goodbye'),
     #path('logout_user/', views.logout_user, name='logout_user'),
 ]

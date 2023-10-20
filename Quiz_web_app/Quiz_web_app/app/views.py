@@ -1,7 +1,8 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import CustomAuthenticationForm, CustomUserCreationForm
+from django.contrib.auth.decorators import login_required
 
 def user_login(request):
     print("in login")
@@ -18,7 +19,7 @@ def user_login(request):
             print("Form errors:", form.errors)
     else:
         form = CustomAuthenticationForm()
-    return render(request, 'app/login.html', {'form': form})
+    return render(request, 'app/user_login.html', {'form': form})
 
 def create_account(request):
     if request.method == 'POST':
@@ -34,22 +35,28 @@ def create_account(request):
         form = CustomUserCreationForm()
     return render(request, 'app/create_account.html', {'form': form})
 
+@login_required
 def index(request):
     print("in index")
     return render(request, 'app/index.html')
 
+@login_required
 def solve_test(request):
     print("in logout")
     return render(request, 'app/index.html')
 
+@login_required
 def create_test(request):
     print("in create_test")
     return render(request, 'app/index.html')
 
+@login_required
 def ranking(request):
     print("in ranking")
     return render(request, 'app/index.html')
 
-def logout(request):
+@login_required
+def user_logout(request):
     print("in logout")
-    return render(request, 'app/index.html')
+    logout(request)
+    return render(request, 'app/user_logout.html')

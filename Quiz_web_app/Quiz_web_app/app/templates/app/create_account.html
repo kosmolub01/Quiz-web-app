@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quiz Web App</title>
+  <title>Quiz Web App - Create Account</title>
   <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  {% load static %}
+  <link href="{% static 'app/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
   <!-- Custom Styles -->
   <style>
     body {
@@ -49,18 +50,30 @@
       <h2 class="text-center mb-4">Create Account</h2>
 
       <!-- Registration Form -->
-      <form>
+      <form method="post" action="{% url 'app:create_account' %}">
+        {% csrf_token %}
+        {% if form.errors %}
+          <div class="alert alert-danger">
+            <ul>
+              {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
         <div class="form-group">
-          <label for="registerNick">Nick</label>
-          <input type="text" class="form-control" id="registerNick" placeholder="Enter nick">
+          <label for="registerUsername">Username</label>
+          <input type="text" class="form-control" name="username" id="registerUsername" placeholder="Enter Username" required>
         </div>
         <div class="form-group">
           <label for="registerPassword">Password</label>
-          <input type="password" class="form-control" id="registerPassword" placeholder="Password">
+          <input type="password" class="form-control" name="password1" id="registerPassword" placeholder="Password" required>
         </div>
         <div class="form-group">
           <label for="confirmPassword">Confirm Password</label>
-          <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password">
+          <input type="password" class="form-control" name="password2" id="confirmPassword" placeholder="Confirm Password" required>
         </div>
         <button type="submit" class="btn btn-primary btn-block">Create Account</button>
       </form>
@@ -68,7 +81,7 @@
       <hr class="my-4">
 
       <!-- Link to go back to login -->
-      <p class="text-center">Already have an account? <a href="#!" class="text-primary">Login here</a></p>
+      <p class="text-center">Already have an account? <a href="{% url 'app:user_login' %}" class="text-primary">Login here</a></p>
     </div>
   </div>
 </div>
