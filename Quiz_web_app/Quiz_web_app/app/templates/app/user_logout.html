@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Quiz Web App Logout Page.">
+
+  <title>Quiz Web App - Logout</title>
+
+  <!-- Bootstrap core CSS -->
+  {% load static %}
+  <link href="{% static 'app/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="{% static 'app/index.css' %}" rel="stylesheet">
+
+  <!-- Custom Styles -->
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .welcome-container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      margin-top: 100px;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    /* Additional style to control the image size */
+    .logo-img {
+      max-width: 100%; /* Make sure the image doesn't exceed its container */
+      height: auto; /* Maintain the image's aspect ratio */
+      margin-bottom: 20px; /* Add some spacing between the image and the button */
+    }
+  </style>
+</head>
+<body>
+
+<div class="container welcome-container text-center">
+  <!-- Use the correct tag for including images -->
+  <img src="{% static 'app/check_circle_green.png' %}" alt="Logo" class="logo-img">
+  <h2 class="mb-4">You have logged out.</h2>
+  
+  <div><a href="{% url 'app:user_login' %}" class="btn btn-lg btn-secondary">Return to the Login</a></div>
+   
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+</body>
+</html>
