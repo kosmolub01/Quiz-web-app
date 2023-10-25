@@ -4,8 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Quiz Web App Main Page.">
-
+  <meta name="description" content="Quiz Web App Main Page">
   <title>Quiz Web App Main Page</title>
 
   <!-- Bootstrap core CSS -->
@@ -14,39 +13,126 @@
 
   <!-- Custom styles for this template -->
   <link href="{% static 'app/index.css' %}" rel="stylesheet">
+
+  <style>
+    .select-quiz-container {
+      max-width: 1000px;
+      min-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .masthead {
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    .app-title {
+      font-size: xx-large;
+      font-weight: 600;
+    }
+
+    .option {
+      font-weight: 500;
+      color: black;
+      text-decoration: none;
+    }
+
+    .option:hover {
+      text-decoration: none;
+      /* Add this to remove underline on hover */
+    }
+  </style>
 </head>
 
-<body class="text-center">
+<body>
 
-  <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
-    <header class="masthead mb-auto">
-      <div class="inner">
-        <h3 class="masthead-brand">Quiz Web App</h3>
-        <nav class="nav nav-masthead justify-content-between">
-          <a class="nav-link active" href="#">Home</a>
-          <a class="nav-link" href="#">Features</a>
-          <a class="nav-link" href="#">Contact</a>
-          <p class="offset">-------------</p>
-          <a href="{% url 'app:user_logout' %}"><button class="btn btn-sm btn-secondary"><b>Logout</b></button></a>
+
+  <div class="container-fluid ">
+    <div class="row py-2 masthead">
+      <div class="col-sm-4 text-right app-title">Quiz Web App</div>
+      <a class="col-sm-2 py-3 text-right option text-primary" href="{% url 'app:index' %}"
+        onclick="ga('send', 'event', 'Navbar', 'Community links', 'Blog');">Select Quiz</a>
+      <a class="col-sm-1 py-3 text-right option" href="{% url 'app:create_test' %}">Create Quiz</a>
+      <div class="col-sm-1 py-3 text-right option">Leaderboard</div>
+      <div class="col-sm-4 py-2 text-center"><a href="{% url 'app:user_logout' %}"><button
+            class="btn btn-sm btn-secondary mt-1"><b>Logout</b></button></a></div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 mx-auto mt-5 app-title text-center">Select Quiz</div>
+    </div>
+
+    <div class="row select-quiz-container mt-3">
+      <div class="col-4">
+        <div class="list-group" id="list-tab" role="tablist">
+          <a class="list-group-item list-group-item-action active" id="list-home-list" data-bs-toggle="list"
+            data-bs-target="#list-home" href="#list-home" role="tab" aria-controls="list-home">Quiz 1</a>
+          <a class="list-group-item list-group-item-action" id="list-profile-list" data-bs-toggle="list"
+            data-bs-target="#list-profile" href="#list-profile" role="tab" aria-controls="list-profile">Quiz 2</a>
+          <a class="list-group-item list-group-item-action" id="list-messages-list" data-bs-toggle="list"
+            href="#list-messages" role="tab" aria-controls="list-messages">Quiz 3</a>
+          <a class="list-group-item list-group-item-action" id="list-settings-list" data-bs-toggle="list"
+            href="#list-settings" role="tab" aria-controls="list-settings">Quiz 4</a>
+        </div>
+      </div>
+      <div class="col-8">
+        <div class="tab-content" id="nav-tabContent">
+          <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">Quiz 1
+          </div>
+          <div class="tab-pane fade show " id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">Quiz 2
+          </div>
+          <div class="tab-pane fade show " id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">Quiz
+            3</div>
+          <div class="tab-pane fade show " id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">Quiz
+            4</div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12  mt-3">
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center">
+            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+    
+            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+          </ul>
         </nav>
       </div>
-    </header>
+    </div>
 
-    <main role="main" class="inner cover">
-      <h1 class="cover-heading">Cover your page.</h1>
-      <p class="lead">Cover is a one-page template for building simple and beautiful home pages. Download, edit the
-        text, and add your own fullscreen background photo to make it your own.</p>
-      <p class="lead">
-        <a href="#" class="btn btn-lg btn-secondary">Learn more</a>
-      </p>
-    </main>
 
-    <footer class="mastfoot mt-auto">
-      <div class="inner">
-        <!--<p>Cover template for <a href="https://getbootstrap.com/">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>-->
-      </div>
-    </footer>
+
   </div>
+  </div>
+
+  <script src="{% static 'app/bootstrap/js/jquery-slim.min.js' %}"></script>
+  <script src="{% static 'app/bootstrap/js/popper.min.js' %}"></script>
+  <script src="{% static 'app/bootstrap/js/bootstrap.min.js' %}"></script>
+
+  <script>
+    var triggerTabList = [].slice.call(document.querySelectorAll('#list-tab a'))
+    triggerTabList.forEach(function (triggerEl) {
+      var tabTrigger = new bootstrap.Tab(triggerEl)
+
+      triggerEl.addEventListener('click', function (event) {
+        event.preventDefault()
+        tabTrigger.show()
+      })
+    })
+  </script>
+
 </body>
 
 </html>
