@@ -3,6 +3,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import CustomAuthenticationForm, CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
+from .models import Quiz
+import math
 
 def user_login(request):
     print("in login")
@@ -38,7 +40,29 @@ def create_account(request):
 @login_required
 def index(request):
     print("in index")
-    return render(request, 'app/index.html')
+
+    number_of_quizes = Quiz.objects.count()
+
+    # 4 quizes per page.
+    range_of_pages = range(1, 5)
+
+    # Pass number of quizes to HTML.
+    context = {'range_of_pages': range_of_pages}
+
+    return render(request, 'app/index.html', context)
+
+@login_required
+def select_quiz(request):
+    print("in select_quiz")
+
+    # select quizes from proper pages. Get the page number from the request
+
+    quizes = Quiz.objects.all()
+
+    # Pass quizes to HTML.
+    context = {'quizes': quizes}
+
+    return render(request, 'app/select_quiz.html', context)
 
 @login_required
 def solve_test(request):
