@@ -29,8 +29,8 @@ class Quiz(models.Model):
 
     def create_example_1(self):
         quiz = Quiz.objects.create(
-            title='My Quiz3',
-            description='This is a sample quiz for testing purposes',
+            title='My Quiz7',
+            description='This is a sample quiz 7 for testing purposes',
             number_of_questions=2
         )
         quiz.save()
@@ -89,8 +89,8 @@ class Quiz(models.Model):
 
     def create_example_2(self):
         quiz = Quiz.objects.create(
-            title='My Quiz4',
-            description='This is a sample quiz for testing purposes',
+            title='My Quiz8',
+            description='This is a sample quiz 8 for testing purposes',
             number_of_questions=2
         )
         quiz.save()

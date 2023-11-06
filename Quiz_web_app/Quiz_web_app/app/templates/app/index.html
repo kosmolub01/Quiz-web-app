@@ -54,6 +54,16 @@
     .quiz {
       overflow-wrap: break-word;
     }
+
+    .quiz-title {
+      font-size: x-large;
+      font-weight: 600;
+    }
+
+    .take-quiz-btn {
+      font-size: large;
+      font-weight: 700;
+    }
   </style>
 </head>
 
@@ -82,9 +92,11 @@
           <ul class="pagination justify-content-center">
             {% for page_no in range_of_pages %}
             {% if forloop.first %}
-            <li class="page-item active" id="page_{{ page_no }}"><a class="page-link" id="page_{{ page_no }}_link" href="{% url 'app:select_quiz' %}?page={{ page_no }}">{{ page_no }}</a></li>
+            <li class="page-item active" id="page_{{ page_no }}"><a class="page-link" id="page_{{ page_no }}_link"
+                href="{% url 'app:select_quiz' %}?page={{ page_no }}">{{ page_no }}</a></li>
             {% else %}
-            <li class="page-item" id="page_{{ page_no }}"><a class="page-link" id="page_{{ page_no }}_link" href="{% url 'app:select_quiz' %}?page={{ page_no }}">{{ page_no }}</a></li>
+            <li class="page-item" id="page_{{ page_no }}"><a class="page-link" id="page_{{ page_no }}_link"
+                href="{% url 'app:select_quiz' %}?page={{ page_no }}">{{ page_no }}</a></li>
             {% endif %}
             {% endfor %}
           </ul>
@@ -104,6 +116,7 @@
   <script>
     $(document).ready(function () {
       $('.pagination a').click(function (event) {
+        // Prevent the browser from navigating to the URL specified in the href when clicking on a page.
         event.preventDefault();
 
         // Remove 'active' class from every page and apply it to the currently clicked page.
@@ -111,7 +124,7 @@
 
         pageList.forEach(function (page) {
           $(page).removeClass('active');
-              })
+        })
         console.log(pageList)
 
         $(this).parent().addClass('active');
@@ -129,13 +142,19 @@
               var tabTrigger = new bootstrap.Tab(triggerEl)
 
               triggerEl.addEventListener('click', function (event) {
-                event.preventDefault()
+
+                // Prevent the browser from navigating to the URL specified in the href when clicking on a tab.
+                // Don't do it for button, so user can take the quiz.
+                if (!$(event.target).is('button')) {
+                  event.preventDefault();
+                }
+
                 tabTrigger.show()
               })
             })
           }
         });
-        
+
       });
       // Programmatically trigger a click event to automatically open first page of quizzes.
       $('#page_1_link').click();
