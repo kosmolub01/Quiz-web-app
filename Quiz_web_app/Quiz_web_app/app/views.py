@@ -3,6 +3,9 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import CustomAuthenticationForm, CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
+from .models import Quiz
+from math import ceil
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def user_login(request):
     print("in login")
@@ -37,8 +40,53 @@ def create_account(request):
 
 @login_required
 def index(request):
+    """
+    Returns a template of index pages. It is a quiz selection page.
+    You can also navigate to other pages.
+    """
     print("in index")
-    return render(request, 'app/index.html')
+
+    # Get number of quizzes to determine the number of pages to show in quiz selection section.
+    number_of_quizzes = Quiz.objects.count()
+
+    # 4 quizzes per page.
+    range_of_pages = range(1, ceil(number_of_quizzes / 4 + 1))
+
+    # Pass number of quizes to HTML.
+    context = {'range_of_pages': range_of_pages}
+
+    return render(request, 'app/index.html', context)
+
+@login_required
+def select_quiz(request):
+    """
+    Returns a template of quiz selection section. It is a part of index page.
+    Depending on requested number of pages, it returns proper quizzes.
+    """
+
+    print("in select_quiz")
+
+    # Select quizzes from proper pages. Get the page number from the request.
+
+    # Explicitly ordering by primary key to get rid of the warning.
+    quizzes_all = Quiz.objects.all().order_by('id')  
+
+    # Show 4 items per page.
+    paginator = Paginator(quizzes_all, 4)  
+
+    page = request.GET.get('page')
+
+    try:
+        # Get the page.
+        quizzes = paginator.page(page)
+    except PageNotAnInteger:
+        # Get the first page.
+        quizzes = paginator.page(1)
+    except EmptyPage:
+        # Get the last page.
+        quizzes = paginator.page(paginator.num_pages)
+
+    return render(request, 'app/select_quiz.html', {'quizzes': quizzes})
 
 @login_required
 def solve_test(request):

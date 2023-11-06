@@ -4,8 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Quiz Web App Main Page.">
-
+  <meta name="description" content="Quiz Web App Main Page">
   <title>Quiz Web App Main Page</title>
 
   <!-- Bootstrap core CSS -->
@@ -14,39 +13,154 @@
 
   <!-- Custom styles for this template -->
   <link href="{% static 'app/index.css' %}" rel="stylesheet">
+
+  <style>
+    .select-quiz-container {
+      max-width: 1000px;
+      min-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .masthead {
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    .app-title {
+      font-size: xx-large;
+      font-weight: 600;
+    }
+
+    .option {
+      font-weight: 500;
+      color: black;
+      text-decoration: none;
+    }
+
+    .option:hover {
+      text-decoration: none;
+      /* Add this to remove underline on hover */
+    }
+
+    .quiz {
+      overflow-wrap: break-word;
+    }
+
+    .quiz-title {
+      font-size: x-large;
+      font-weight: 600;
+    }
+
+    .take-quiz-btn {
+      font-size: large;
+      font-weight: 700;
+    }
+  </style>
 </head>
 
-<body class="text-center">
+<body>
 
-  <div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
-    <header class="masthead mb-auto">
-      <div class="inner">
-        <h3 class="masthead-brand">Quiz Web App</h3>
-        <nav class="nav nav-masthead justify-content-between">
-          <a class="nav-link active" href="#">Home</a>
-          <a class="nav-link" href="#">Features</a>
-          <a class="nav-link" href="#">Contact</a>
-          <p class="offset">-------------</p>
-          <a href="{% url 'app:user_logout' %}"><button class="btn btn-sm btn-secondary"><b>Logout</b></button></a>
+
+  <div class="container-fluid ">
+    <div class="row py-2 masthead">
+      <div class="col-sm-4 text-right app-title">Quiz Web App</div>
+      <a class="col-sm-2 py-3 text-right option text-primary" href="{% url 'app:index' %}">Select Quiz</a>
+      <a class="col-sm-1 py-3 text-right option" href="{% url 'app:create_test' %}">Create Quiz</a>
+      <div class="col-sm-1 py-3 text-right option">Leaderboard</div>
+      <div class="col-sm-4 py-2 text-center"><a href="{% url 'app:user_logout' %}"><button
+            class="btn btn-sm btn-secondary mt-1"><b>Logout</b></button></a></div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 mx-auto mt-5 app-title text-center">Select Quiz</div>
+    </div>
+
+    <div id="select-quiz-container"> </div>
+
+    <div class="row">
+      <div class="col-12  mt-3" id="pagination">
+        <nav aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            {% for page_no in range_of_pages %}
+            {% if forloop.first %}
+            <li class="page-item active" id="page_{{ page_no }}"><a class="page-link" id="page_{{ page_no }}_link"
+                href="{% url 'app:select_quiz' %}?page={{ page_no }}">{{ page_no }}</a></li>
+            {% else %}
+            <li class="page-item" id="page_{{ page_no }}"><a class="page-link" id="page_{{ page_no }}_link"
+                href="{% url 'app:select_quiz' %}?page={{ page_no }}">{{ page_no }}</a></li>
+            {% endif %}
+            {% endfor %}
+          </ul>
         </nav>
       </div>
-    </header>
+    </div>
 
-    <main role="main" class="inner cover">
-      <h1 class="cover-heading">Cover your page.</h1>
-      <p class="lead">Cover is a one-page template for building simple and beautiful home pages. Download, edit the
-        text, and add your own fullscreen background photo to make it your own.</p>
-      <p class="lead">
-        <a href="#" class="btn btn-lg btn-secondary">Learn more</a>
-      </p>
-    </main>
 
-    <footer class="mastfoot mt-auto">
-      <div class="inner">
-        <!--<p>Cover template for <a href="https://getbootstrap.com/">Bootstrap</a>, by <a href="https://twitter.com/mdo">@mdo</a>.</p>-->
-      </div>
-    </footer>
+
   </div>
+  </div>
+
+  <script src="{% static 'app/bootstrap/js/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'app/bootstrap/js/popper.min.js' %}"></script>
+  <script src="{% static 'app/bootstrap/js/bootstrap.min.js' %}"></script>
+
+  <script>
+    $(document).ready(function () {
+      $('.pagination a').click(function (event) {
+        // Prevent the browser from navigating to the URL specified in the href when clicking on a page.
+        event.preventDefault();
+
+        // Remove 'active' class from every page and apply it to the currently clicked page.
+        var pageList = [].slice.call(document.querySelectorAll('#pagination li'))
+
+        pageList.forEach(function (page) {
+          $(page).removeClass('active');
+        })
+        console.log(pageList)
+
+        $(this).parent().addClass('active');
+
+        var url = $(this).attr('href');
+        console.log(url);
+        $.ajax({
+          type: 'GET',
+          url: url,
+          success: function (quizes) {
+            $('#select-quiz-container').html(quizes);
+
+            var triggerTabList = [].slice.call(document.querySelectorAll('#select-quiz-container a'))
+            triggerTabList.forEach(function (triggerEl) {
+              var tabTrigger = new bootstrap.Tab(triggerEl)
+
+              triggerEl.addEventListener('click', function (event) {
+
+                // Prevent the browser from navigating to the URL specified in the href when clicking on a tab.
+                // Don't do it for button, so user can take the quiz.
+                if (!$(event.target).is('button')) {
+                  event.preventDefault();
+                }
+
+                tabTrigger.show()
+              })
+            })
+          }
+        });
+
+      });
+      // Programmatically trigger a click event to automatically open first page of quizzes.
+      $('#page_1_link').click();
+    });
+  </script>
+
 </body>
 
 </html>
