@@ -106,7 +106,7 @@ def leaderboard(request):
     print("in leaderboard")
 
     # Sort users so the best users are first.
-    users = User.objects.all().order_by('score')  
+    users = User.objects.all().order_by('score').reverse()
 
     # Pass quizes to HTML.
     context = {'users': users}
