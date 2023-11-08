@@ -12,8 +12,7 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=30, unique=True)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
+    score = models.PositiveSmallIntegerField(default=0)
 
     objects = CustomUserManager()
 

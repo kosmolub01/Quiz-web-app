@@ -5,10 +5,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="Quiz Web App Main Page">
+
+  {% load static %}
+
   <title>Quiz Web App Main Page</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'app/Q.ico' %}">
 
   <!-- Bootstrap core CSS -->
-  {% load static %}
   <link href="{% static 'app/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
 
   <!-- Custom styles for this template -->
@@ -75,7 +78,7 @@
       <div class="col-sm-4 text-right app-title">Quiz Web App</div>
       <a class="col-sm-2 py-3 text-right option text-primary" href="{% url 'app:index' %}">Select Quiz</a>
       <a class="col-sm-1 py-3 text-right option" href="{% url 'app:create_test' %}">Create Quiz</a>
-      <div class="col-sm-1 py-3 text-right option">Leaderboard</div>
+      <a class="col-sm-1 py-3 text-right option" href="{% url 'app:leaderboard' %}"">Leaderboard</a>
       <div class="col-sm-4 py-2 text-center"><a href="{% url 'app:user_logout' %}"><button
             class="btn btn-sm btn-secondary mt-1"><b>Logout</b></button></a></div>
     </div>

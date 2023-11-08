@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import CustomAuthenticationForm, CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
-from .models import Quiz
+from .models import Quiz, User
 from math import ceil
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -86,7 +86,10 @@ def select_quiz(request):
         # Get the last page.
         quizzes = paginator.page(paginator.num_pages)
 
-    return render(request, 'app/select_quiz.html', {'quizzes': quizzes})
+    # Pass quizes to HTML.
+    context = {'quizzes': quizzes}
+
+    return render(request, 'app/select_quiz.html', context)
 
 @login_required
 def solve_test(request):
@@ -99,9 +102,16 @@ def create_test(request):
     return render(request, 'app/index.html')
 
 @login_required
-def ranking(request):
-    print("in ranking")
-    return render(request, 'app/index.html')
+def leaderboard(request):
+    print("in leaderboard")
+
+    # Sort users so the best users are first.
+    users = User.objects.all().order_by('score').reverse()
+
+    # Pass quizes to HTML.
+    context = {'users': users}
+
+    return render(request, 'app/leaderboard.html', context)
 
 @login_required
 def user_logout(request):
