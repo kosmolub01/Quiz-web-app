@@ -7,6 +7,7 @@ from .models import Quiz, User
 from math import ceil
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseRedirect
+from time import sleep
 
 def user_login(request):
     print("in login")
@@ -110,10 +111,15 @@ def create_quiz(request):
         form = QuizCreationForm(request.POST)
         # Check whether it's valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required
+            # process the data in form.cleaned_data as required - check whether wiki article exists, start quiz creation.
             # ...
-            # redirect to a new URL:
-            return HttpResponseRedirect(reverse("app:quiz_successful_submission"))
+
+            if is_wiki_article_title_valid():
+                # Redirect to a new URL:
+                return HttpResponseRedirect(reverse("app:quiz_successful_submission"))
+            else:
+                form.errors['title'] = form.error_class(['Provided Wikipedia article title is not valid. Please, enter valid article title.'])
+                return render(request, 'app/create_quiz.html', {"form": form})
 
     # If a GET (or any other method) we'll create a blank form.
     else:
@@ -143,3 +149,7 @@ def user_logout(request):
     print("in logout")
     logout(request)
     return render(request, 'app/user_logout.html')
+
+def is_wiki_article_title_valid():
+    sleep(2)
+    return True
