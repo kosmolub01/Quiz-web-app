@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Quiz Successful Submission">
+
+  {% load static %}
+
+  <title>Successful Submission</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'app/Q.ico' %}">
+
+  <!-- Bootstrap core CSS -->
+  <link href="{% static 'app/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="{% static 'app/index.css' %}" rel="stylesheet">
+
+  <style>
+    .select-quiz-container {
+      max-width: 1000px;
+      min-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .masthead {
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    .app-title {
+      font-size: xx-large;
+      font-weight: 600;
+    }
+
+    .option {
+      font-weight: 500;
+      color: black;
+      text-decoration: none;
+    }
+
+    .option:hover {
+      text-decoration: none;
+      /* Add this to remove underline on hover */
+    }
+
+    .quiz {
+      overflow-wrap: break-word;
+    }
+
+    .quiz-title {
+      font-size: x-large;
+      font-weight: 600;
+    }
+
+    .take-quiz-btn {
+      font-size: large;
+      font-weight: 700;
+    }
+
+    .welcome-container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      margin-top: 100px;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div class="container-fluid ">
+    <div class="row py-2 masthead">
+      <div class="col-sm-4 text-right app-title">Quiz Web App</div>
+      <a class="col-sm-2 py-3 text-right option" href="{% url 'app:index' %}">Select Quiz</a>
+      <a class="col-sm-1 py-3 text-right option" href="{% url 'app:create_quiz' %}">Create Quiz</a>
+      <a class="col-sm-1 py-3 text-right option" href="{% url 'app:leaderboard' %}"">Leaderboard</a>
+      <div class="col-sm-4 py-2 text-center"><a href="{% url 'app:user_logout' %}"><button
+            class="btn btn-sm btn-secondary mt-1"><b>Logout</b></button></a></div>
+    </div>
+
+    <div class="container welcome-container text-center">
+      <!-- Use the correct tag for including images -->
+      <img src="{% static 'app/check_circle_green.png' %}" alt="Logo" class="logo-img">
+      <h2 class="m-4">Your quiz has been successfully submitted.</h2>
+      
+      <p>Your quiz should appear in the "Select Quiz" section in a couple of minutes.</p>
+       
+    </div>
+
+
+  </div>
+  </div>
+
+  <script src="{% static 'app/bootstrap/js/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'app/bootstrap/js/popper.min.js' %}"></script>
+  <script src="{% static 'app/bootstrap/js/bootstrap.min.js' %}"></script>
+
+
+</body>
+
+</html>

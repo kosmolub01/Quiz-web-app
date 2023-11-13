@@ -1,11 +1,12 @@
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from .forms import CustomAuthenticationForm, CustomUserCreationForm
+from .forms import CustomAuthenticationForm, CustomUserCreationForm, QuizCreationForm
 from django.contrib.auth.decorators import login_required
 from .models import Quiz, User
 from math import ceil
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import HttpResponseRedirect
 
 def user_login(request):
     print("in login")
@@ -97,9 +98,33 @@ def solve_test(request):
     return render(request, 'app/index.html')
 
 @login_required
-def create_test(request):
-    print("in create_test")
-    return render(request, 'app/index.html')
+def create_quiz(request):
+    print("in create_quiz")
+    return render(request, 'app/create_quiz.html')
+
+@login_required
+def create_quiz(request):
+    # If this is a POST request we need to process the form data.
+    if request.method == "POST":
+        # Create a form instance and populate it with data from the request:
+        form = QuizCreationForm(request.POST)
+        # Check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse("app:quiz_successful_submission"))
+
+    # If a GET (or any other method) we'll create a blank form.
+    else:
+        form = QuizCreationForm()
+
+    return render(request, 'app/create_quiz.html', {"form": form})
+
+@login_required
+def quiz_successful_submission(request):
+    print("in quiz_successful_submission")
+    return render(request, 'app/quiz_successful_submission.html')
 
 @login_required
 def leaderboard(request):
