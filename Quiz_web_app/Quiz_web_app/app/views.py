@@ -8,6 +8,7 @@ from math import ceil
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseRedirect
 from time import sleep
+from .quiz_generator import QuizGenerator
 
 def user_login(request):
     print("in login")
@@ -111,15 +112,19 @@ def create_quiz(request):
         form = QuizCreationForm(request.POST)
         # Check whether it's valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required - check whether wiki article exists, start quiz creation.
-            # ...
+            # process the data in form.cleaned_data as required - create quiz
+            try:
+                title = form.cleaned_data['title']
+                description = form.cleaned_data['description']
+                text = form.cleaned_data['text']
 
-            if is_wiki_article_title_valid():
-                # Redirect to a new URL:
-                return HttpResponseRedirect(reverse("app:quiz_successful_submission"))
-            else:
-                form.errors['title'] = form.error_class(['Provided Wikipedia article title is not valid. Please, enter valid article title.'])
-                return render(request, 'app/create_quiz.html', {"form": form})
+                create_and_save_quiz(title, description, text)
+            except Exception as e:
+                print("An error occurred during quiz creation:", e)
+                # Redirect to a URL with error message:
+                return HttpResponseRedirect(reverse("app:quiz_unsuccessful_submission"))
+            
+            return HttpResponseRedirect(reverse("app:quiz_successful_submission"))
 
     # If a GET (or any other method) we'll create a blank form.
     else:
@@ -131,6 +136,11 @@ def create_quiz(request):
 def quiz_successful_submission(request):
     print("in quiz_successful_submission")
     return render(request, 'app/quiz_successful_submission.html')
+
+@login_required
+def quiz_unsuccessful_submission(request):
+    print("in quiz_unsuccessful_submission")
+    return render(request, 'app/quiz_unsuccessful_submission.html')
 
 @login_required
 def leaderboard(request):
@@ -150,6 +160,9 @@ def user_logout(request):
     logout(request)
     return render(request, 'app/user_logout.html')
 
-def is_wiki_article_title_valid():
-    sleep(2)
-    return True
+def create_and_save_quiz(title, description, text):
+
+    quiz_generator = QuizGenerator(title, description, text)
+    quiz_generator.generate_quiz()
+    print(quiz_generator.quiz)
+    

@@ -101,9 +101,8 @@
               {{ form.title.errors }}
             </div>
             {% endif %}
-
-
           </div>
+
           {{ form.description.label_tag }}
           {{ form.description }}
           <div class="form-group">
@@ -112,14 +111,23 @@
               {{ form.description.errors }}
             </div>
             {% endif %}
-
-
           </div>
+
+          {{ form.text.label_tag }}
+          {{ form.text }}
+          <div class="form-group">
+            {% if form.text.errors %}
+            <div class="alert alert-danger mt-2">
+              {{ form.text.errors }}
+            </div>
+            {% endif %}
+          </div>
+
           <button type="submit" class="btn btn-primary submit-quiz-btn" onclick="toggleFormInputsVisibility()"
             id="createQuizBtn">Create quiz</button>
-          <button class="btn btn-primary" type="button" disabled id="checkingBtn" hidden>
+          <button class="btn btn-primary" type="button" disabled id="creatingBtn" hidden>
             <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-            Checking...
+            Creating...
           </button>
         </form>
       </div>
@@ -137,18 +145,20 @@
     function toggleFormInputsVisibility() {
       // Change button.
       var createQuizBtn = document.getElementById("createQuizBtn");
-      var checkingBtn = document.getElementById("checkingBtn");
+      var creatingBtn = document.getElementById("creatingBtn");
 
       createQuizBtn.style.display = "none";
-      checkingBtn.hidden = false;
-      checkingBtn.style.display = "inline-block";
+      creatingBtn.hidden = false;
+      creatingBtn.style.display = "inline-block";
 
       // Change form inputs 'readOnly' property.
       var titleInput = document.getElementById("id_title");
       var descriptionInput = document.getElementById("id_description");
+      var textInput = document.getElementById("id_text");
 
       titleInput.readOnly = true;
       descriptionInput.readOnly = true;
+      textInput.readOnly = true;
     }
   </script>
 

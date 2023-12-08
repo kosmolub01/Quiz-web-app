@@ -4,11 +4,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Leaderboard">
+  <meta name="description" content="Quiz Unsuccessful Submission">
 
   {% load static %}
 
-  <title>Leaderboard</title>
+  <title>Successful Submission</title>
   <link rel="icon" type="image/x-icon" href="{% static 'app/Q.ico' %}">
 
   <!-- Bootstrap core CSS -->
@@ -67,6 +67,16 @@
       font-size: large;
       font-weight: 700;
     }
+
+    .welcome-container {
+      max-width: 400px;
+      margin: auto;
+      padding: 20px;
+      margin-top: 100px;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
   </style>
 </head>
 
@@ -78,42 +88,19 @@
       <div class="col-sm-4 text-right app-title">Quiz Web App</div>
       <a class="col-sm-2 py-3 text-right option" href="{% url 'app:index' %}">Select Quiz</a>
       <a class="col-sm-1 py-3 text-right option" href="{% url 'app:create_quiz' %}">Create Quiz</a>
-      <a class="col-sm-1 py-3 text-right option text-primary" href="{% url 'app:leaderboard' %}"">Leaderboard</a>
+      <a class="col-sm-1 py-3 text-right option" href="{% url 'app:leaderboard' %}"">Leaderboard</a>
       <div class="col-sm-4 py-2 text-center"><a href="{% url 'app:user_logout' %}"><button
             class="btn btn-sm btn-secondary mt-1"><b>Logout</b></button></a></div>
     </div>
 
-    <div class="row">
-      <div class="col-12 mx-auto mt-5 app-title text-center">Leaderboard</div>
+    <div class="container welcome-container text-center">
+      <!-- Use the correct tag for including images -->
+      <img src="{% static 'app/cross_circle_red.png' %}" alt="Logo" class="logo-img">
+      <h2 class="m-4">Your quiz has not been submitted.</h2>
+      
+      <p>An error occurred during quiz creation.</p>
+       
     </div>
-
-    
-
-    <div class="row">
-      <div class="col-12  mt-3 select-quiz-container" id="leaderboard">
-        <table class="table">
-          <thead>
-            <tr>
-              <th scope="col">Rank</th>
-              <th scope="col">User</th>
-              <th scope="col">Score</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for user in users %}
-            <tr>
-                <th scope="row">{{ forloop.counter }}</th>
-                <td>{{ user.username }}</td>
-                <td>{{ user.score }}</td>
-            </tr>
-            {% endfor %}
-            <tr>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
 
 
   </div>
@@ -122,6 +109,7 @@
   <script src="{% static 'app/bootstrap/js/jquery-3.7.1.js' %}"></script>
   <script src="{% static 'app/bootstrap/js/popper.min.js' %}"></script>
   <script src="{% static 'app/bootstrap/js/bootstrap.min.js' %}"></script>
+
 
 </body>
 
