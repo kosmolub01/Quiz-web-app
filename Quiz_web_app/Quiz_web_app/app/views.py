@@ -107,13 +107,13 @@ def create_quiz(request):
 
 @login_required
 def create_quiz(request):
-    # If this is a POST request we need to process the form data.
+    # If this is a POST request, we need to process the form data.
     if request.method == "POST":
         # Create a form instance and populate it with data from the request:
         form = QuizCreationForm(request.POST)
         # Check whether it's valid:
         if form.is_valid():
-            # process the data in form.cleaned_data as required - create quiz
+            # Process the data in form.cleaned_data as required - create quiz
             try:
                 title = form.cleaned_data['title']
                 description = form.cleaned_data['description']
@@ -122,16 +122,24 @@ def create_quiz(request):
                 generate_and_save_quiz(title, description, text)
             except Exception as e:
                 print("An error occurred during quiz creation:", e)
-                # Redirect to a URL with error message:
+                # Redirect to a URL with an error message:
                 return HttpResponseRedirect(reverse("app:quiz_unsuccessful_submission"))
-            
+
             return HttpResponseRedirect(reverse("app:quiz_successful_submission"))
 
-    # If a GET (or any other method) we'll create a blank form.
+    # If a GET (or any other method), we'll create a blank form.
     else:
         form = QuizCreationForm()
 
-    return render(request, 'app/create_quiz.html', {"form": form})
+    # Create an HTTP response with the form and set cache control headers
+    response = render(request, 'app/create_quiz.html', {"form": form})
+
+    # Set Cache-Control, Pragma, and Expires headers
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+
+    return response
 
 @login_required
 def quiz_successful_submission(request):
