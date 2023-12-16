@@ -3,12 +3,13 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from .forms import CustomAuthenticationForm, CustomUserCreationForm, QuizCreationForm
 from django.contrib.auth.decorators import login_required
-from .models import Quiz, User
+from .models import Quiz, Question, User, Distractor, Answer
 from math import ceil
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseRedirect
 from time import sleep
 from .quiz_generator import QuizGenerator
+from django.db import transaction
 
 def user_login(request):
     print("in login")
@@ -118,7 +119,7 @@ def create_quiz(request):
                 description = form.cleaned_data['description']
                 text = form.cleaned_data['text']
 
-                create_and_save_quiz(title, description, text)
+                generate_and_save_quiz(title, description, text)
             except Exception as e:
                 print("An error occurred during quiz creation:", e)
                 # Redirect to a URL with error message:
@@ -160,9 +161,40 @@ def user_logout(request):
     logout(request)
     return render(request, 'app/user_logout.html')
 
-def create_and_save_quiz(title, description, text):
+def generate_and_save_quiz(title, description, text):
 
-    quiz_generator = QuizGenerator(title, description, text)
-    quiz_generator.generate_quiz()
-    print(quiz_generator.quiz)
+    with transaction.atomic():
+        quiz_generator = QuizGenerator(title, description, text)
+        quiz_generator.generate_quiz()
+        print(quiz_generator.quiz['title'])
+
+        # Save quiz.
+        quiz = Quiz.objects.create(
+                title=quiz_generator.quiz['title'],
+                description=quiz_generator.quiz['description'],
+                number_of_questions=len(quiz_generator.quiz['questions'])
+            )
+        
+        # Save the questions.
+        for generated_question in quiz_generator.quiz['questions']:
+            saved_question = Question.objects.create(
+            quiz=quiz,
+            text=generated_question['question_text']
+            )
+
+            # Save correct answer for the question.
+            Answer.objects.create(
+                question=saved_question,
+                text=generated_question['answer']
+            )
+
+            # Save distractors for the question.
+            for distractor in generated_question['distractors']:
+                Distractor.objects.create(
+                question=saved_question,
+                text=distractor
+                )
+
+
+
     
