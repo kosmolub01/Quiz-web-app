@@ -1,11 +1,16 @@
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.urls import reverse
-from .forms import CustomAuthenticationForm, CustomUserCreationForm
+from .forms import CustomAuthenticationForm, CustomUserCreationForm, QuizCreationForm
 from django.contrib.auth.decorators import login_required
-from .models import Quiz, User
+from .models import Quiz, Question, User, Distractor, Answer
 from math import ceil
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.http import HttpResponseRedirect
+from time import sleep
+#from .quiz_generator import QuizGenerator
+from django.db import transaction
+import random
 
 def user_login(request):
     print("in login")
@@ -41,7 +46,7 @@ def create_account(request):
 @login_required
 def index(request):
     """
-    Returns a template of index pages. It is a quiz selection page.
+    Returns a template of index page. It is a quiz selection page.
     You can also navigate to other pages.
     """
     print("in index")
@@ -92,14 +97,118 @@ def select_quiz(request):
     return render(request, 'app/select_quiz.html', context)
 
 @login_required
-def solve_test(request):
-    print("in logout")
-    return render(request, 'app/index.html')
+def solve_quiz(request, quiz_id):
+    print("in solve_quiz. quiz_id =", quiz_id)
+
+    # Retrieve all quiz questions from DB.
+    quiz_metadata = Quiz.objects.get(id=quiz_id)
+
+    # Retrieve all quiz questions from DB.
+    questions_metadata = Question.objects.filter(quiz=quiz_id)
+
+    questions = []
+
+    # Retrieve answer and distractors for each question from DB.
+    for quiz_question in questions_metadata:
+        correct_answer = Answer.objects.get(question=quiz_question)
+        distractors = Distractor.objects.filter(question=quiz_question)
+        answers = [correct_answer]
+        answers = answers + list(distractors)
+        random.shuffle(answers)
+
+        print("answers", answers)
+
+        questions.append({
+                    "question_text": quiz_question.text,
+                    "answers": answers,
+                })
+
+    quiz = {"id": quiz_id,"title": quiz_metadata.title, "description": quiz_metadata.description, "questions": questions}
+
+    # Pass the quiz (questions_metadata, questions) in context.
+    context = {'quiz': quiz}
+
+    return render(request, 'app/solve_quiz.html', context)
 
 @login_required
-def create_test(request):
-    print("in create_test")
-    return render(request, 'app/index.html')
+def evaluate_the_answers(request, quiz_id):
+    print("in evaluate_the_answers. quiz_id =", quiz_id)
+
+    """# Retrieve all quiz questions from DB.
+    quiz_metadata = Quiz.objects.get(id=quiz_id)
+
+    # Retrieve all quiz questions from DB.
+    questions_metadata = Question.objects.filter(quiz=quiz_id)
+
+    questions = []
+
+    # Retrieve answer and distractors for each question from DB.
+    for quiz_question in questions_metadata:
+        correct_answer = Answer.objects.get(question=quiz_question)
+        distractors = Distractor.objects.filter(question=quiz_question)
+        answers = [correct_answer]
+        answers = answers + list(distractors)
+        random.shuffle(answers)
+
+        print("answers", answers)
+
+        questions.append({
+                    "question_text": quiz_question.text,
+                    "answers": answers,
+                })
+
+    quiz = {"title": quiz_metadata.title, "description": quiz_metadata.description, "questions": questions}
+
+    # Pass the quiz (questions_metadata, questions) in context.
+    context = {'quiz': quiz}"""
+
+    return render(request, 'app/result.html')
+
+@login_required
+def create_quiz(request):
+    # If this is a POST request, we need to process the form data.
+    if request.method == "POST":
+        # Create a form instance and populate it with data from the request:
+        form = QuizCreationForm(request.POST)
+        # Check whether it's valid:
+        if form.is_valid():
+            # Process the data in form.cleaned_data as required - create quiz
+            try:
+                title = form.cleaned_data['title']
+                description = form.cleaned_data['description']
+                text = form.cleaned_data['text']
+
+                generate_and_save_quiz(title, description, text)
+            except Exception as e:
+                print("An error occurred during quiz creation:", e)
+                # Redirect to a URL with an error message:
+                return HttpResponseRedirect(reverse("app:quiz_unsuccessful_submission"))
+
+            return HttpResponseRedirect(reverse("app:quiz_successful_submission"))
+
+    # If a GET (or any other method), we'll create a blank form.
+    else:
+        form = QuizCreationForm()
+
+    # Create an HTTP response with the form and set cache control headers
+    response = render(request, 'app/create_quiz.html', {"form": form})
+
+    # Set Cache-Control, Pragma, and Expires headers
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+
+    return response
+
+@login_required
+def quiz_successful_submission(request):
+    print("in quiz_successful_submission")
+    return render(request, 'app/quiz_successful_submission.html')
+
+@login_required
+def quiz_unsuccessful_submission(request):
+    print("in quiz_unsuccessful_submission")
+    return render(request, 'app/quiz_unsuccessful_submission.html')
 
 @login_required
 def leaderboard(request):
@@ -118,3 +227,44 @@ def user_logout(request):
     print("in logout")
     logout(request)
     return render(request, 'app/user_logout.html')
+
+def generate_and_save_quiz(title, description, text):
+
+    """with transaction.atomic():
+        quiz_generator = QuizGenerator(title, description, text)
+        quiz_generator.generate_quiz()
+        print(quiz_generator.quiz['title'])
+
+        if len(quiz_generator.quiz['questions']) < 1:
+            raise ValidationError("No questions generated for the quiz.") 
+
+        # Save quiz.
+        quiz = Quiz.objects.create(
+                title=quiz_generator.quiz['title'],
+                description=quiz_generator.quiz['description'],
+                number_of_questions=len(quiz_generator.quiz['questions'])
+            )
+        
+        # Save the questions.
+        for generated_question in quiz_generator.quiz['questions']:
+            saved_question = Question.objects.create(
+            quiz=quiz,
+            text=generated_question['question_text']
+            )
+
+            # Save correct answer for the question.
+            Answer.objects.create(
+                question=saved_question,
+                text=generated_question['answer']
+            )
+
+            # Save distractors for the question.
+            for distractor in generated_question['distractors']:
+                Distractor.objects.create(
+                question=saved_question,
+                text=distractor
+                )"""
+
+
+
+    
