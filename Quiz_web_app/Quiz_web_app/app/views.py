@@ -149,7 +149,10 @@ def solve_quiz(request, quiz_id):
 
         print(f"Score: {score}")
 
-        return render(request, 'app/result.html')
+        # Pass the quiz (questions_metadata, questions) in context.
+        context = {'correct_answers': score, 'incorrect_answers': quiz_metadata.number_of_questions - score, 'number_of_questions': quiz_metadata.number_of_questions}
+
+        return render(request, 'app/result.html', context)
         
 
     # If a GET, make sure user did not solve this quiz before and if not, send quiz form.
