@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Quiz In Progress">
+
+  {% load static %}
+
+  <title>Quiz In Progress</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'app/Q.ico' %}">
+
+  <!-- Bootstrap core CSS -->
+  <link href="{% static 'app/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="{% static 'app/index.css' %}" rel="stylesheet">
+
+  <style>
+    .select-quiz-container {
+      max-width: 1000px;
+      min-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .masthead {
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+
+    .app-title {
+      font-size: xx-large;
+      font-weight: 600;
+    }
+
+    .option {
+      font-weight: 500;
+      color: black;
+      text-decoration: none;
+    }
+
+    .option:hover {
+      text-decoration: none;
+      /* Add this to remove underline on hover */
+    }
+
+    .quiz {
+      overflow-wrap: break-word;
+    }
+
+    .quiz-title {
+      font-size: x-large;
+      font-weight: 600;
+    }
+
+    .submit-quiz-btn {
+      font-size: medium;
+      font-weight: 700;
+    }
+
+    .timer {
+      font-size: medium;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div class="container-fluid ">
+    <div class="row py-2 masthead">
+      <div class="col-sm-4 text-right app-title">Quiz Web App</div>
+      <a class="col-sm-2 py-3 text-right option" href="{% url 'app:index' %}">Select Quiz</a>
+      <a class="col-sm-1 py-3 text-right option" href="{% url 'app:create_quiz' %}">Create Quiz</a>
+      <a class="col-sm-1 py-3 text-right option" href="{% url 'app:leaderboard' %}">Leaderboard</a>
+      <div class=" col-sm-4 py-2 text-center"><a href="{% url 'app:user_logout' %}"><button
+            class="btn btn-sm btn-secondary mt-1"><b>Logout</b></button></a>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-12 mx-auto mt-5 app-title text-center">{{ quiz.title }}</div>
+    </div>
+
+    <div class="row">
+      <div class="col-12  mt-3 select-quiz-container">
+
+        <div id="timer" class="text-right mb-3">
+          <span class="timer">
+            Time left:
+          </span>
+          <span id="minutes">{% with quiz.questions|length as num_questions %}{{ num_questions }}{% endwith %}</span>
+          minutes
+          <span id="seconds">0</span> seconds
+        </div>
+
+
+        <form action="{% url 'app:solve_quiz' quiz_id=quiz.id %}" method="post" id="solveQuiz">
+          {% csrf_token %}
+
+          {% for question in quiz.questions %}
+          <b>{{ forloop.counter }}. {{ question.question_text }}</b>
+          {% for answer in question.answers %}
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="question_{{ forloop.parentloop.counter }}"
+              id="flexRadioDefault{{ forloop.parentloop.counter }}{{ forloop.counter }}" value="{{ answer }}">
+            <label class="form-check-label" for="flexRadioDefault{{ forloop.parentloop.counter }}{{ forloop.counter }}">
+              <p>{{ answer }}</p>
+            </label>
+          </div>
+          {% endfor %}
+          <p></p>
+          {% endfor %}
+
+          <button type="submit" class="btn btn-primary submit-quiz-btn" id="finishBtn">Finish</button>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <script src="{% static 'app/bootstrap/js/jquery-3.7.1.js' %}"></script>
+  <script src="{% static 'app/bootstrap/js/popper.min.js' %}"></script>
+  <script src="{% static 'app/bootstrap/js/bootstrap.min.js' %}"></script>
+
+  <script>
+    $(document).ready(function () {
+      const minutesElement = document.getElementById('minutes');
+      const secondsElement = document.getElementById('seconds');
+
+      // Get the initial number of minutes from the HTML element.
+      const initialMinutes = parseInt(minutesElement.textContent, 10);
+
+      let totalSeconds = initialMinutes * 60; // Convert minutes to seconds.
+
+      setInterval(() => {
+        // Calculate minutes and seconds.
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+
+        // Update the displayed minutes and seconds.
+        minutesElement.textContent = minutes;
+        secondsElement.textContent = seconds;
+
+        // Check if the countdown has reached zero.
+        if (totalSeconds <= 0) {
+          // Submit the form.
+          document.getElementById('solveQuiz').submit();
+        } else {
+          // Decrease the total seconds.
+          totalSeconds -= 1;
+        }
+      }, 1000);
+    });
+
+  </script>
+
+</body>
+
+</html>

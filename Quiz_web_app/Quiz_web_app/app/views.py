@@ -100,7 +100,7 @@ def select_quiz(request):
 def solve_quiz(request, quiz_id):
     print("in solve_quiz. quiz_id =", quiz_id)
 
-    # Retrieve all quiz questions from DB.
+    # Retrieve quiz metadata from DB.
     quiz_metadata = Quiz.objects.get(id=quiz_id)
 
     # Retrieve all quiz questions from DB.
@@ -108,9 +108,13 @@ def solve_quiz(request, quiz_id):
 
     questions = []
 
+    # Needed to evaluate the user answers.
+    correct_answers = []
+
     # Retrieve answer and distractors for each question from DB.
     for quiz_question in questions_metadata:
         correct_answer = Answer.objects.get(question=quiz_question)
+        correct_answers.append(correct_answer)
         distractors = Distractor.objects.filter(question=quiz_question)
         answers = [correct_answer]
         answers = answers + list(distractors)
@@ -123,46 +127,40 @@ def solve_quiz(request, quiz_id):
                     "answers": answers,
                 })
 
-    quiz = {"id": quiz_id,"title": quiz_metadata.title, "description": quiz_metadata.description, "questions": questions}
+    # If this is a POST request, we need to evaluate the answers.
+    if request.method == "POST":
+        print("request.POST:", request.POST)
 
-    # Pass the quiz (questions_metadata, questions) in context.
-    context = {'quiz': quiz}
+        selected_answers = {} 
+        score = 0
 
-    return render(request, 'app/solve_quiz.html', context)
+        for key, value in request.POST.items():
+                # Retrieve the answers selected by user.
+                if key.startswith('question_'):                  
+                    question_number = key.split('_')[1]
+                    selected_answer = value
+                    selected_answers[question_number] = selected_answer
 
-@login_required
-def evaluate_the_answers(request, quiz_id):
-    print("in evaluate_the_answers. quiz_id =", quiz_id)
+                    # If the answer is correct, add 1 point.
+                    if selected_answer == correct_answers[int(question_number)-1].text:
+                        score = score + 1
+                    else:
+                        print(f"selected_answer {selected_answer} is not equal: {correct_answers[int(question_number)-1].text}")
 
-    """# Retrieve all quiz questions from DB.
-    quiz_metadata = Quiz.objects.get(id=quiz_id)
+        print(f"Score: {score}")
 
-    # Retrieve all quiz questions from DB.
-    questions_metadata = Question.objects.filter(quiz=quiz_id)
+        return render(request, 'app/result.html')
+        
 
-    questions = []
+    # If a GET, make sure user did not solve this quiz before and if not, send quiz form.
+    else:
+        # Prepare the quiz dictionary.
+        quiz = {"id": quiz_id,"title": quiz_metadata.title, "description": quiz_metadata.description, "questions": questions}
 
-    # Retrieve answer and distractors for each question from DB.
-    for quiz_question in questions_metadata:
-        correct_answer = Answer.objects.get(question=quiz_question)
-        distractors = Distractor.objects.filter(question=quiz_question)
-        answers = [correct_answer]
-        answers = answers + list(distractors)
-        random.shuffle(answers)
+        # Pass the quiz (questions_metadata, questions) in context.
+        context = {'quiz': quiz}
 
-        print("answers", answers)
-
-        questions.append({
-                    "question_text": quiz_question.text,
-                    "answers": answers,
-                })
-
-    quiz = {"title": quiz_metadata.title, "description": quiz_metadata.description, "questions": questions}
-
-    # Pass the quiz (questions_metadata, questions) in context.
-    context = {'quiz': quiz}"""
-
-    return render(request, 'app/result.html')
+        return render(request, 'app/solve_quiz.html', context)
 
 @login_required
 def create_quiz(request):
@@ -190,15 +188,15 @@ def create_quiz(request):
     else:
         form = QuizCreationForm()
 
-    # Create an HTTP response with the form and set cache control headers
-    response = render(request, 'app/create_quiz.html', {"form": form})
+        # Create an HTTP response with the form and set cache control headers
+        response = render(request, 'app/create_quiz.html', {"form": form})
 
-    # Set Cache-Control, Pragma, and Expires headers
-    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response['Pragma'] = 'no-cache'
-    response['Expires'] = '0'
+        # Set Cache-Control, Pragma, and Expires headers
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
 
-    return response
+        return response
 
 @login_required
 def quiz_successful_submission(request):
