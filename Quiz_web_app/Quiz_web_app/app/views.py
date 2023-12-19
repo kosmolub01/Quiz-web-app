@@ -143,11 +143,15 @@ def solve_quiz(request, quiz_id):
 
                     # If the answer is correct, add 1 point.
                     if selected_answer == correct_answers[int(question_number)-1].text:
-                        score = score + 1
+                        score += 1
                     else:
                         print(f"selected_answer {selected_answer} is not equal: {correct_answers[int(question_number)-1].text}")
 
         print(f"Score: {score}")
+
+        user = User.objects.get(username=request.user.username)
+        user.score += score
+        user.save()
 
         # Pass the quiz (questions_metadata, questions) in context.
         context = {'correct_answers': score, 'incorrect_answers': quiz_metadata.number_of_questions - score, 'number_of_questions': quiz_metadata.number_of_questions}
@@ -191,15 +195,17 @@ def create_quiz(request):
     else:
         form = QuizCreationForm()
 
-        # Create an HTTP response with the form and set cache control headers
-        response = render(request, 'app/create_quiz.html', {"form": form})
+    # Create an HTTP response with the form and set cache control headers
+    response = render(request, 'app/create_quiz.html', {"form": form})
 
-        # Set Cache-Control, Pragma, and Expires headers
-        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response['Pragma'] = 'no-cache'
-        response['Expires'] = '0'
+    # Set Cache-Control, Pragma, and Expires headers
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
 
-        return response
+    return response
+
+    
 
 @login_required
 def quiz_successful_submission(request):
@@ -231,7 +237,7 @@ def user_logout(request):
 
 def generate_and_save_quiz(title, description, text):
 
-    """with transaction.atomic():
+   """ with transaction.atomic():
         quiz_generator = QuizGenerator(title, description, text)
         quiz_generator.generate_quiz()
         print(quiz_generator.quiz['title'])
