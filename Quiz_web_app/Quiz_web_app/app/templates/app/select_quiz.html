@@ -1,0 +1,43 @@
+<div class="row select-quiz-container mt-3">
+  <div class="col-4">
+    <div class="list-group" role="tablist">
+      <!-- Quizzes titles -->
+      {% for quiz in quizzes %}
+      {% if forloop.first %}
+      <a class="list-group-item list-group-item-action quiz active" id="{{ quiz.id }}" data-bs-toggle="list"
+        data-bs-target="#list-{{ quiz.id }}" href="#list-{{ quiz.id }}" role="tab" aria-controls="#list-{{ quiz.id }}">
+        {{ quiz.title }}
+      </a>
+      {% else %}
+      <a class="list-group-item list-group-item-action quiz" id="{{ quiz.id }}" data-bs-toggle="list"
+        data-bs-target="#list-{{ quiz.id }}" href="#list-{{ quiz.id }}" role="tab" aria-controls="#list-{{ quiz.id }}">
+        {{ quiz.title }}
+      </a>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-8">
+    <div class="tab-content" id="nav-tabContent">
+      <!-- Quizzes descriptions -->
+      {% for quiz in quizzes %}
+      {% if forloop.first %}
+      <div class="tab-pane fade show active" id="list-{{ quiz.id }}" role="tabpanel" aria-labelledby="{{ quiz.id }}">
+        <p class="quiz-title">{{ quiz.title }}<p>
+        <p>{{ quiz.description }}</p>
+        <p>Number of questions: {{ quiz.number_of_questions }}</p>
+        <a href="{% url 'app:solve_quiz' quiz_id=quiz.id %}"><button class="btn btn-lg btn-secondary mt-1 take-quiz-btn">Take the quiz</button></a>
+      </div>
+      {% else %}
+      <div class="tab-pane fade show" id="list-{{ quiz.id }}" role="tabpanel" aria-labelledby="{{ quiz.id }}">
+        <p class="quiz-title">{{ quiz.title }}<p>
+        <p>{{ quiz.description }}</p>
+        <p>Number of questions: {{ quiz.number_of_questions }}</p>
+        <a href="{% url 'app:solve_quiz' quiz_id=quiz.id  %}"><button class="btn btn-lg btn-secondary mt-1 take-quiz-btn">Take the quiz</button></a>
+      </div>
+      {% endif %}
+
+      {% endfor %}
+    </div>
+  </div>
+</div>

@@ -8,7 +8,7 @@ from math import ceil
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseRedirect
 from time import sleep
-#from .quiz_generator import QuizGenerator
+from .quiz_generator import QuizGenerator
 from django.db import transaction
 import random
 
@@ -237,7 +237,7 @@ def user_logout(request):
 
 def generate_and_save_quiz(title, description, text):
 
-   """ with transaction.atomic():
+    with transaction.atomic():
         quiz_generator = QuizGenerator(title, description, text)
         quiz_generator.generate_quiz()
         print(quiz_generator.quiz['title'])
@@ -270,7 +270,7 @@ def generate_and_save_quiz(title, description, text):
                 Distractor.objects.create(
                 question=saved_question,
                 text=distractor
-                )"""
+                )
 
 
 
