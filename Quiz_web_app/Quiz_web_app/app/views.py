@@ -8,7 +8,7 @@ from math import ceil
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseRedirect
 from time import sleep
-#from .quiz_generator import QuizGenerator
+from .quiz_generator import QuizGenerator
 from django.db import transaction
 import random
 
@@ -100,7 +100,7 @@ def select_quiz(request):
 def solve_quiz(request, quiz_id):
     print("in solve_quiz. quiz_id =", quiz_id)
 
-    # Retrieve all quiz questions from DB.
+    # Retrieve quiz metadata from DB.
     quiz_metadata = Quiz.objects.get(id=quiz_id)
 
     # Retrieve all quiz questions from DB.
@@ -108,9 +108,13 @@ def solve_quiz(request, quiz_id):
 
     questions = []
 
+    # Needed to evaluate the user answers.
+    correct_answers = []
+
     # Retrieve answer and distractors for each question from DB.
     for quiz_question in questions_metadata:
         correct_answer = Answer.objects.get(question=quiz_question)
+        correct_answers.append(correct_answer)
         distractors = Distractor.objects.filter(question=quiz_question)
         answers = [correct_answer]
         answers = answers + list(distractors)
@@ -123,46 +127,47 @@ def solve_quiz(request, quiz_id):
                     "answers": answers,
                 })
 
-    quiz = {"id": quiz_id,"title": quiz_metadata.title, "description": quiz_metadata.description, "questions": questions}
+    # If this is a POST request, we need to evaluate the answers.
+    if request.method == "POST":
+        print("request.POST:", request.POST)
 
-    # Pass the quiz (questions_metadata, questions) in context.
-    context = {'quiz': quiz}
+        selected_answers = {} 
+        score = 0
 
-    return render(request, 'app/solve_quiz.html', context)
+        for key, value in request.POST.items():
+                # Retrieve the answers selected by user.
+                if key.startswith('question_'):                  
+                    question_number = key.split('_')[1]
+                    selected_answer = value
+                    selected_answers[question_number] = selected_answer
 
-@login_required
-def evaluate_the_answers(request, quiz_id):
-    print("in evaluate_the_answers. quiz_id =", quiz_id)
+                    # If the answer is correct, add 1 point.
+                    if selected_answer == correct_answers[int(question_number)-1].text:
+                        score += 1
+                    else:
+                        print(f"selected_answer {selected_answer} is not equal: {correct_answers[int(question_number)-1].text}")
 
-    """# Retrieve all quiz questions from DB.
-    quiz_metadata = Quiz.objects.get(id=quiz_id)
+        print(f"Score: {score}")
 
-    # Retrieve all quiz questions from DB.
-    questions_metadata = Question.objects.filter(quiz=quiz_id)
+        user = User.objects.get(username=request.user.username)
+        user.score += score
+        user.save()
 
-    questions = []
+        # Pass the quiz (questions_metadata, questions) in context.
+        context = {'correct_answers': score, 'incorrect_answers': quiz_metadata.number_of_questions - score, 'number_of_questions': quiz_metadata.number_of_questions}
 
-    # Retrieve answer and distractors for each question from DB.
-    for quiz_question in questions_metadata:
-        correct_answer = Answer.objects.get(question=quiz_question)
-        distractors = Distractor.objects.filter(question=quiz_question)
-        answers = [correct_answer]
-        answers = answers + list(distractors)
-        random.shuffle(answers)
+        return render(request, 'app/result.html', context)
+        
 
-        print("answers", answers)
+    # If a GET, make sure user did not solve this quiz before and if not, send quiz form.
+    else:
+        # Prepare the quiz dictionary.
+        quiz = {"id": quiz_id,"title": quiz_metadata.title, "description": quiz_metadata.description, "questions": questions}
 
-        questions.append({
-                    "question_text": quiz_question.text,
-                    "answers": answers,
-                })
+        # Pass the quiz (questions_metadata, questions) in context.
+        context = {'quiz': quiz}
 
-    quiz = {"title": quiz_metadata.title, "description": quiz_metadata.description, "questions": questions}
-
-    # Pass the quiz (questions_metadata, questions) in context.
-    context = {'quiz': quiz}"""
-
-    return render(request, 'app/result.html')
+        return render(request, 'app/solve_quiz.html', context)
 
 @login_required
 def create_quiz(request):
@@ -200,6 +205,8 @@ def create_quiz(request):
 
     return response
 
+    
+
 @login_required
 def quiz_successful_submission(request):
     print("in quiz_successful_submission")
@@ -230,7 +237,7 @@ def user_logout(request):
 
 def generate_and_save_quiz(title, description, text):
 
-    """with transaction.atomic():
+    with transaction.atomic():
         quiz_generator = QuizGenerator(title, description, text)
         quiz_generator.generate_quiz()
         print(quiz_generator.quiz['title'])
@@ -263,7 +270,7 @@ def generate_and_save_quiz(title, description, text):
                 Distractor.objects.create(
                 question=saved_question,
                 text=distractor
-                )"""
+                )
 
 
 
