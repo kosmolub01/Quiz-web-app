@@ -7,7 +7,7 @@ from .models import Quiz, Question, User, Distractor, Answer
 from math import ceil
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponseRedirect
-from time import sleep
+import time
 from .quiz_generator import QuizGenerator
 from django.db import transaction
 import random
@@ -237,6 +237,9 @@ def user_logout(request):
 
 def generate_and_save_quiz(title, description, text):
 
+    # Measure time of quiz generation and saving.
+    start_time = time.time()
+
     with transaction.atomic():
         quiz_generator = QuizGenerator(title, description, text)
         quiz_generator.generate_quiz()
@@ -271,6 +274,10 @@ def generate_and_save_quiz(title, description, text):
                 question=saved_question,
                 text=distractor
                 )
+
+    end_time = time.time()  
+    elapsed_time = end_time - start_time
+    print(f"Generating and saving quiz took {elapsed_time} seconds.")
 
 
 
