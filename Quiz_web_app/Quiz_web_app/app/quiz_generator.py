@@ -74,7 +74,7 @@ class QuizGenerator:
             # Tokenize the summary text into sentences.
             sentences = self._split_text_to_sentences(summary)
 
-        # Generate paraphrases for each sentence in the text.
+        # Stwórz parafrazy dla każdego zdania w tekście.
         parrot = Parrot()
         paraphrased_text = ""
 
@@ -84,6 +84,7 @@ class QuizGenerator:
             paraphrases = parrot.augment(input_phrase=sentence, do_diverse=True)
 
             if paraphrases:
+                # Jeśli parafraza różni się wystarczająco od zdania pierwotnego, użyj jej.
                 if paraphrases[0][1] > 50:
                     paraphrased_sentence = paraphrases[0][0]
 
@@ -112,15 +113,15 @@ class QuizGenerator:
 
         return paraphrased_text
 
-    def _get_important_words(self, text):
+    def _get_keyphrases(self, text):
         """
-        Extracts important words from a given text using MultipartiteRank algorithm.
+        Extracts keyphrases from a given text using MultipartiteRank algorithm.
 
         Args:
             art (str): The input text.
 
         Returns:
-            list: A list of the 25 most important words extracted from the text.
+            list: A list of the 3 most important words extracted from the text.
         """
         # Initialize MultipartiteRank extractor.
         extractor = pke.unsupervised.MultipartiteRank()
@@ -131,11 +132,6 @@ class QuizGenerator:
         # Define the part-of-speech tags to consider.
         pos = {'PROPN', 'NOUN'}
 
-        # Define the stop words.
-        stops = list(string.punctuation)
-        stops += ['-lrb-', '-rrb-', '-lcb-', '-rcb-', '-lsb-', '-rsb-']
-        stops += stopwords.words('english')
-
         # Select the candidates based on the defined part-of-speech tags.
         extractor.candidate_selection(pos=pos)
 
@@ -143,16 +139,16 @@ class QuizGenerator:
         extractor.candidate_weighting()
 
         # Initialize the result list.
-        result = []
+        keyphrases = []
 
-        # Get the 25 best candidates.
-        ex = extractor.get_n_best(n=25)
+        # Get the 3 best keyphrases with score.
+        keyphrases_with_score = extractor.get_n_best(n=3)
 
         # Append each candidate to the result list.
-        for each in ex:
-            result.append(each[0])
+        for keyphrase_with_score in keyphrases_with_score:
+            keyphrases.append(keyphrase_with_score[0])
 
-        return result
+        return keyphrases
 
     def _split_text_to_sentences(self, text):
         """
@@ -348,7 +344,7 @@ class QuizGenerator:
                 iterator = 1
                 for sentence in sentences:
                     print(f"sentence {iterator}: {sentence}")
-                    keywords = self._get_important_words(sentence)
+                    keywords = self._get_keyphrases(sentence)
                     print(f"keywords: {keywords}")
                     if keywords:
                         mapped_sentences[keywords[0]] = sentence
