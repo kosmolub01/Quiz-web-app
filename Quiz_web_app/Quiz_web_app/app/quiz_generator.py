@@ -173,12 +173,12 @@ class QuizGenerator:
 
         return sentences
  
-    def _get_word_sense(self, sentences, word):
+    def _get_word_sense(self, sentence, word):
         """
         Get the WordNet sense of a given word in a sentence.
 
         Args:
-            sentences (str): The sentence containing the word.
+            sentence (str): The sentence containing the word.
             word (str): The word to find the sense for.
 
         Returns:
@@ -198,10 +198,10 @@ class QuizGenerator:
         # If there are synsets.
         if synsets:
             # Get the synset with the highest similarity to the word using Wu-Palmer Similarity.
-            wup = max_similarity(sentences, word, 'wup', pos='n')
+            wup = max_similarity(sentence, word, 'wup', pos='n')
 
             # Get the synset with the highest similarity to the word using Adapted Lesk.
-            adapted_lesk_output = adapted_lesk(sentences, word, pos='n')
+            adapted_lesk_output = adapted_lesk(sentence, word, pos='n')
 
             # Check if wup and adapted_lesk_output are in synsets before getting their index.
             if wup in synsets and adapted_lesk_output in synsets:
@@ -217,12 +217,12 @@ class QuizGenerator:
             # If there are no synsets, return None.
             return None
 
-    def _get_distractors_word_net(self, syn, word):
+    def _get_distractors_word_net(self, synset, word):
         """
         Get distractors for a given word using WordNet.
 
         Args:
-            syn (WordNetSynset): The synset object representing the word.
+            synset (WordNetSynset): The synset object representing the word.
             word (str): The word for which distractors are to be generated.
 
         Returns:
@@ -241,7 +241,7 @@ class QuizGenerator:
             word.replace(" ", "_")
 
         # Get the hypernyms of the word.
-        hypernym = syn.hypernyms()
+        hypernym = synset.hypernyms()
 
         # If there are no hypernyms, return an empty list.
         if len(hypernym) == 0:
@@ -258,9 +258,6 @@ class QuizGenerator:
 
             # Replace underscores with spaces in the name.
             name = name.replace("_", " ")
-
-            # Capitalize each word in the name.
-            name = " ".join(w.capitalize() for w in name.split())
 
             # If the name is not None and not already in the list, add it to the list.
             if name is not None and name not in distractors:
@@ -317,6 +314,26 @@ class QuizGenerator:
                     distractors.append(word2)
 
         return distractors
+    
+    def _get_antonym(self, word):
+            """
+            Retrieves the antonym of a given word using WordNet.
+
+            Parameters:
+            word (str): The word for which the antonym is to be retrieved.
+
+            Returns:
+            str or None: The antonym of the given word, or None if no antonym is found.
+            """
+            # Get the sets of synonyms of the word.
+            synsets = wn.synsets(word)
+            if synsets:
+                # Get the first lemma (dictionary form of a word) of the first synset.
+                lemmas = synsets[0].lemmas()
+                if lemmas:
+                    if lemmas[0].antonyms():
+                        return lemmas[0].antonyms()[0].name()
+            return None
         
     def generate_quiz(self):
             """
@@ -351,7 +368,7 @@ class QuizGenerator:
 
                     iterator += 1
 
-                # Find distractors for every keyword.
+                # Find distractors and antonyms for every keyword.
                 for keyword, sentence in mapped_sentences.items():
                     # Get the word sense for the keyword.
                     wordsense = self._get_word_sense(sentence, keyword)
@@ -372,7 +389,7 @@ class QuizGenerator:
 
                     if len(dists) == 0:
                         distractors[keyword] = "No distractors"
-
+                   
                 for keyword, sentence in mapped_sentences.items():
                     print(f"keyword: {keyword}")
                     print(f"sentence: {sentence}")
@@ -382,13 +399,22 @@ class QuizGenerator:
                 # Formulate the questions and options for those keywords which have at least 2 distractors.
                 iterator = 1
                 for keyword in distractors:
+                    # Get the antonym for the keyword.
+                    
+                    antonym = self._get_antonym(keyword)
+                    
                     dists = distractors[keyword]
+                    
                     if len(dists) > 1 and isinstance(dists, list):
                         sent = mapped_sentences[keyword]
                         p = re.compile(keyword, re.IGNORECASE)
                         op = p.sub("________", sent)
                         print("Question %s-> " % (iterator), op)  # Prints the question along with a question number.
-                        options = [keyword.capitalize()] + dists
+                        if antonym:
+                            print("antonym", antonym)
+                            options = [keyword] + [antonym] + dists
+                        else:
+                            options = [keyword] + dists
                         options = options[:4]
 
                         question = {
