@@ -1,10 +1,9 @@
 import re
 import random
-import string
 
 import pke
 import requests
-from nltk.corpus import stopwords, wordnet as wn
+from nltk.corpus import wordnet as wn
 from nltk.tokenize import sent_tokenize
 from pywsd.lesk import adapted_lesk
 from pywsd.similarity import max_similarity
@@ -74,7 +73,7 @@ class QuizGenerator:
             # Tokenize the summary text into sentences.
             sentences = self._split_text_to_sentences(summary)
 
-        # Stwórz parafrazy dla każdego zdania w tekście.
+        # Create paraphrases for each sentence in the text.
         parrot = Parrot()
         paraphrased_text = ""
 
@@ -84,7 +83,7 @@ class QuizGenerator:
             paraphrases = parrot.augment(input_phrase=sentence, do_diverse=True)
 
             if paraphrases:
-                # Jeśli parafraza różni się wystarczająco od zdania pierwotnego, użyj jej.
+                # If the paraphrase is sufficiently different from the original sentence, use it.
                 if paraphrases[0][1] > 50:
                     paraphrased_sentence = paraphrases[0][0]
 
@@ -399,8 +398,7 @@ class QuizGenerator:
                 # Formulate the questions and options for those keywords which have at least 2 distractors.
                 iterator = 1
                 for keyword in distractors:
-                    # Get the antonym for the keyword.
-                    
+                    # Get the antonym for the keyword.                   
                     antonym = self._get_antonym(keyword)
                     
                     dists = distractors[keyword]
@@ -438,9 +436,6 @@ class QuizGenerator:
             else:
                 raise ValueError("Quiz Generation Error", "Quiz not generated. First, you need to provide the text to generate the quiz")
 
-        
-
 if __name__ == "__main__":
-
     generator = QuizGenerator("Quiz_1", "Sample quiz", path_to_textfile="text.txt")
     generator.generate_quiz()
