@@ -396,7 +396,6 @@ class QuizGenerator:
 
                 # Generate the quiz. 
                 # Formulate the questions and options for those keywords which have at least 2 distractors.
-                iterator = 1
                 for keyword in distractors:
                     # Get the antonym for the keyword.                   
                     antonym = self._get_antonym(keyword)
@@ -407,7 +406,7 @@ class QuizGenerator:
                         sent = mapped_sentences[keyword]
                         p = re.compile(keyword, re.IGNORECASE)
                         op = p.sub("________", sent)
-                        print("Question %s-> " % (iterator), op)  # Prints the question along with a question number.
+                        
                         if antonym:
                             print("antonym", antonym)
                             options = [keyword] + [antonym] + dists
@@ -421,15 +420,6 @@ class QuizGenerator:
                             "distractors": options[1:]
                         }
                         self.quiz["questions"].append(question)
-
-                        opts = ['a', 'b', 'c', 'd']
-                        random.shuffle(options)
-
-                        for i, ch in enumerate(options):
-                            print("\t", opts[i], ") ", ch)  # Print the options
-                            print()
-
-                        iterator += 1
 
                 return self.quiz
             
